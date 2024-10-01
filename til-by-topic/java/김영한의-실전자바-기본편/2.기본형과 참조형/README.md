@@ -152,3 +152,94 @@ C와 같은 과거 프로그래밍 언어는 개발자가 직접 사용해서 �
 자바는 이런 과정을 자동으로 처리해준다. 아무도 참조하지 않는 인스턴스가 있으면 JVM의 GC(가비지 컬렉션)가 더 이상 사용하지 않는 인스턴스라 판단하고 해당 인스턴스를 자동으로 메모리에서 제거해준다. (자바의 큰 장점)
 
 객체는 해당 객체를 참조하는 곳이 있으면, JVM이 종료할 때 까지 계속 생존한다. 그런데 중간에 해당 객체를 참조하는 곳이 모두 사라지면 그때 JVM은 필요 없는 객체로 판단하고 GC(가비지 컬렉션)를 사용해서 제거한다.
+
+## NullPointerException
+객체를 참조할 때는 `.`(dot)을 사용한다. 이렇게 하면 참조값을 사용해서 해당 객체를 찾아갈 수 있다. 그런데 참조값이 `null`이라면 값이 없다는 뜻이므로, 찾아갈 수 있는 객체(인스턴스)가 없다. `NullPointerException`은 이처럼 `null`에 `.`(dot)을 찍었을 때 발생한다.
+
+지역 변수의 경우에는 `null`문제를 파악하는 것이 어렵지 않다. 다음과 같이 멤버 변수가 `null`인 경우에는 주의가 필요하다.
+
+```java
+// Data Class
+package ref;
+
+public class Data {
+    int value;
+}
+```
+
+```java
+// BigData Class
+package ref;
+
+public class BigData {
+    Data data;
+    int count;
+}
+```
+
+```java
+// NullMain3
+package ref;
+
+public class NullMain3 {
+    public static void main(String[] args) {
+        BigData bigData = new BigData();
+
+        System.out.println("bigData.count=" + bigData.count);
+        System.out.println("bigData.data=" + bigData.data);
+
+        //NullPointException
+        System.out.println("bigData.data.value:" + bigData.data.value);
+    }
+}
+```
+이렇게 하면 `BigData`의 인스턴스의 멤버변수는 초기화가 되어 `count = 0`, `data = null`이지만 `bigData.data.value`에 접근하려고 하면 참조 할 곳이 없으니까 `NullPointerException`이 발생한다.
+
+![alt text](image-4.png)
+
+이를 해결하려면 `Data` 인스턴스를 만드록 `BigData.data`멤버 변수에 참조값을 할당하면 된다. 
+
+```java
+// NullMain4
+package ref;
+
+public class NullMain4 {
+    public static void main(String[] args) {
+        BigData bigData = new BigData();
+        Data data = new Data();
+        bigData.data = data;
+
+        System.out.println("bigData.count=" + bigData.count);
+        System.out.println("bigData.data=" + bigData.data);
+
+        //NullPointException
+        System.out.println("bigData.data.value:" + bigData.data.value);
+    }
+}
+```
+![alt text](image-5.png)
+
+### 정리
+`NullPointerException`이 발생하면 `null`값에 `.`(dot)을 찍었다고 생각하면 문제를 쉽게 찾을 수 있다.
+
+## 마무리 정리
+### 대원칙: 자바는 항상 변수의 값을 복사해서 대입한다.
+자바에서 변수에 값에 대입하는 것은 변수에 들어 있는 값을 복사해서 대입하는 것이다.
+기본형, 참조형 모두 항상 변수에 있는 값을 복사해서 대입한다. 기본형이면 변수에 들어 있는 실제 사용하는 값을 복사해서 대입하고, 참조형이면 변수에 들어 있는 참조값을 복사해서 대입한다.
+기본형이든 참조형이든 변수의 값을 대입하는 방식은 같다. 하지만 기본형과 참조형에 따라 동작하는 방식이 달라진다.
+
+### 기본형 vs 참조형 - 기본
+- 자바의 데이터 타입을 가장 크게 보면 기본형, 참조형 둘로 나눌 수 있다.
+- 기본형을 제외한 나머지 변수는 모두 참조형이다. 클래스와 배열을 다루는 변수는, 참조형이다.
+- 기본형 변수는 값을 직접 저장하지만, 참조형 변수는 참조(주소)를 저장한다.
+- 기본형 변수는 산술 연산을 수행할 수 있지만, 참조형 변수는 산술 연산을 수행할 수 없다.
+- 기본형 변수는 `null`을 할당할 수 없지만, 참조형 변수는 `null`을 할당할 수 있다.
+
+### 기본형 vs 참조형 - 대입
+- 기본형과 참조형 모두 대입시 변수 안에 있는 값을 읽고 복사해서 전달한다.
+- 기본형은 사용하는 값을 복사해서 전달하고, 참조형은 참조값을 복사해서 전달한다! 이것이 중요!!. 실제 인스턴스가 복사되는 것이 아니다. 인스턴스를 가리키는 참조값을 복사해서 전달하는 것!! 따라서 하나의 인스턴스를 여러곳에서 참조할 수 있다.
+- 헷갈리면 그냥 변수 안에 있는 들어간 값을 떠올려보자. 기본형은 사용하는 값이, 참조형은 참조값이 들어있다! 변수에 어떤 값이 들어있든간에 그 값을 그대로 복사해서 전달한다.
+
+### 기본형 vs 참조형 - 메서드 호출 
+- 메서드 호출시 기본형은 메서드 내부에서 매개변수(파라미터)의 값을 변경해도 호출자의 변수 값에는 영향이 없다.
+- 메서드 호출시 참조형은 메서드 내부에서 매개변수(파라미터)로 전달된 객체의 멤버 변수를 변경하면, 호출자의 객체도 변경된다.
