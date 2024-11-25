@@ -102,4 +102,80 @@ ElectricCar에서 move 오버라이딩 했다고 가정하자.
     - `private`메서드는 해당 클래스에서만 접근 가능하기 때문에 하위 클래스에서 보이지 않아 불가능.
 - **생성자 오버라이딩**: 생성자는 오버라이딩 할 수 없다.
 
+## 상속과 접근 제어
+![alt text](image-6.png)
+**접근 제어와 메모리 구조**
+
+![alt text](image-7.png)
+본인 타입에 없으면 부모 타입에서 기능을 찾는데, 이때 접근 제어자가 영향을 준다. 왜냐하면 객체 내부에서는 자식과 부모가 구분되어 있기 때문이다. 결국 자식 타입에서 부모 타입의 기능을 호출할 때, 부모 입장에서 보면 외부에서 호출한 것과 같다.
+
+### super - 부모 참조
+부모와 자식의 필드명이 같거나 오버라이딩 되어 있으면, 자식에서 부모의 필드나 메서드를 호출할 수 없다.
+이때 `super`키워드를 사용하면 부모를 참조할 수 있다. `super`는 이름 그대로 부모 클래스에 대한 참조를 나타낸다.
+
+다음 예를 보자. 부모의 필드명과 자식의 필드명이 둘다 `value`로 똑같다. 메서드도 `hello()`로 자식에서 오버라이딩 되어 있다. 이때 자식 클래스에서 부모 클래스의 `value`와 `hello()`를 호출하고 싶다면 `super`키워드를 사용하면 된다.
+
+![alt text](image-8.png)
+
+```java
+package extends1.super1;
+
+public class Parent {
+    public String value = "parent";
+
+    public void hello() {
+        System.out.println("Parent.hello");
+    }
+}
+```
+
+```java
+package extends1.super1;
+
+public class Child extends Parent {
+    public String value = "child";
+
+    @Override
+    public void hello() {
+        System.out.println("Child.hello");
+    }
+
+    public void call() {
+        System.out.println("this value = " + this.value);
+        System.out.println("super value = " + super.value);
+
+        this.hello();
+        super.hello();
+    }
+}
+```
+
+`call()`메서드를 보자.
+- `this`는 자기 자신의 참조를 뜻한다. `this`는 생략할 수 있다.
+- `super`는 부모 클래스에 대한 참조를 뜻한다.
+- 필드 이름과 메서드 이름이 같지만 `super`를 사용해서 부모 클래스에 있는 기능을 사용할 수 있다.
+
+```java
+package extends1.super1;
+
+public class Super1Main {
+    public static void main(String[] args) {
+        Child child = new Child();
+        child.call();
+    }
+}
+```
+
+실행결과
+```
+this value = child
+super value = parent
+Child.hello
+Parent.hello
+```
+실행 결과를 보면 `super`를 사용한 경우 부모 클래스의 기능을 사용한 것을 확인할 수 있다.
+
+**super 메모리 그림**
+![alt text](image-9.png)
+
 
